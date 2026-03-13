@@ -3,7 +3,7 @@ import (
 "fmt"
 "log"
 "os"
-"github.com/yourusername/gin-firebase-backend/models"
+"github.com/Julianarwansah/be-catalog-p4-1123150112/models"
 "gorm.io/driver/mysql"
 "gorm.io/gorm"
 "gorm.io/gorm/logger"
