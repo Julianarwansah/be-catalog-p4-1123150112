@@ -1,5 +1,5 @@
 // .gitignore
-# .gitignore
+.gitignore
 .env
 firebase-service-account.json
 *.exe
