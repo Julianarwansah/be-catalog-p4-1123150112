@@ -4,33 +4,37 @@ import (
 	"log"
 	"os"
 
-	"github.com/Julianarwansah/be-catalog-p4-1123150112/config"
 	"github.com/joho/godotenv"
+	"github.com/Julianarwansah/be-catalog-p4-1123150112/config"
+	"github.com/Julianarwansah/be-catalog-p4-1123150112/routes"
 )
 
 func main() {
-	// 1. Load file .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("Peringatan: File .env tidak ditemukan, menggunakan environment system")
+
+	// 1. Load environment variables dari .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("File .env tidak ditemukan, menggunakan environment variable sistem")
 	}
 
-	// 2. Inisialisasi Database (AutoMigrate terpanggil di sini)
+	// 2. Inisialisasi Firebase Admin SDK
+	config.InitFirebase()
+
+	// 3. Inisialisasi database + AutoMigrate
 	config.InitDatabase()
 
-	// 3. Inisialisasi Firebase (Opsional jika file JSON belum ada)
-	credPath := os.Getenv("FIREBASE_CREDENTIALS_PATH")
-	if _, err := os.Stat(credPath); err == nil {
-		config.InitFirebase()
-	} else {
-		log.Printf("Info: Firebase credentials tidak ditemukan di %s, skip...", credPath)
-	}
+	// 4. Setup Gin router dengan semua routes
+	router := routes.SetupRouter()
 
+	// 5. Jalankan server
 	port := os.Getenv("APP_PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("Server siap! Silakan cek phpMyAdmin di MAMP untuk tabel baru.")
-	log.Printf("Aplikasi berjalan di port %s", port)
+	log.Printf("Server berjalan di http://localhost:%s", port)
+	log.Printf("Health check: http://localhost:%s/v1/health", port)
+
+	if err := router.Run(":" + port); err != nil {
+		log.Fatalf("Gagal menjalankan server: %v", err)
+	}
 }
